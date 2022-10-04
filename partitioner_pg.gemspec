@@ -1,6 +1,6 @@
 lib = File.expand_path('lib', __dir__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'partitioner_pg/version'
+require 'pg_partitioner/version'
 
 Gem::Specification.new do |spec|
   spec.name          = 'pg_partitioner'

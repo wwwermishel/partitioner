@@ -1,4 +1,4 @@
-# PartitionerPg
+# PgPartitioner
 
 It's a gem for a partitioning Postgresql tables in Ruby on Rails.
 Now gem can help you with partitioning tables by months. New table for each month.
@@ -8,7 +8,7 @@ Now gem can help you with partitioning tables by months. New table for each mont
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'partitioner_pg'
+gem 'pg_partitioner'
 ```
 
 ## Usage

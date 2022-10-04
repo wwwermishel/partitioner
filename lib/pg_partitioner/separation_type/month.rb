@@ -1,8 +1,8 @@
-module PartitionerPg
+module PgPartitioner
   module SeparationType
     module Month
       def create_current_month_table
-        create_month_tablecreate_month_table(Date.today)
+        create_month_table(Date.today)
       end
 
       def create_next_month_table
@@ -35,13 +35,13 @@ module PartitionerPg
         execute_sql(sql)
       end
 
-      def create_partitioning_by_month_trigger_sql
+      def create_partitioning_by_month_triggers
         sql = "CREATE OR REPLACE FUNCTION #{table_name}_insert_trigger() RETURNS trigger AS
     $$
            DECLARE
              curY varchar(4);
              curM varchar(2);
-             tbl varchar(30);
+             tbl varchar(40);
            BEGIN
               select cast(DATE_PART('year', new.#{parting_column}) as varchar) into curY;
               select lpad(cast(DATE_PART('month', new.#{parting_column}) as varchar), 2, '0') into curM;
@@ -78,10 +78,12 @@ module PartitionerPg
       end
 
       def drop_partitioning_by_month_trigger_sql
-        "DROP TRIGGER #{table_name}_insert ON #{table_name};
+        sql = "DROP TRIGGER #{table_name}_insert ON #{table_name};
          DROP FUNCTION #{table_name}_insert_trigger();
          DROP TRIGGER #{table_name}_after_insert ON #{table_name};
          DROP FUNCTION #{table_name}_delete_trigger();"
+
+        execute_sql(sql)
       end
 
       def create_partition_indexes(partition_table_name)
@@ -118,38 +120,9 @@ module PartitionerPg
         end
       end
 
-      def create_custom_index(table_name, index_fields, is_unique = false)
-        ActiveRecord::Migration.add_index table_name, index_fields, unique: is_unique
-      end
-
-      def create_custom_named_index(table_name, index_fields, name, is_unique = false)
-        ActiveRecord::Migration.add_index table_name, index_fields, name: name, unique: is_unique
-      end
-
       def name_of_partition_table(date = Date.today)
         date.strftime("#{table_name}_y%Ym%m")
       end
-
-      def execute_sql(sql_string)
-        ActiveRecord::Base.connection.execute(sql_string)
-      end
-
-      # Template method
-      # Column which will determine partition for row (must be date or datetime type). Default value is :created_at
-      def parting_column
-        :created_at
-      end
-
-      # Template method
-      def partition_table_indexes; end
-
-      def partition_table_named_indexes; end
-
-      # Template method
-      def partition_table_unique_indexes; end
-
-      # Template method
-      def partition_table_named_unique_indexes; end
     end
   end
 end
