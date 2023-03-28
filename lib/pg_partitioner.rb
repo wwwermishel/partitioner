@@ -26,7 +26,7 @@ module PgPartitioner
   private
 
   def execute_sql(sql_string)
-    ActiveRecord::Base.connection.execute(sql_string)
+    connection.execute(sql_string)
   end
 
   def create_custom_index(table_name, index_fields, is_unique = false)

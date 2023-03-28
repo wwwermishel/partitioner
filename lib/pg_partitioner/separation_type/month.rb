@@ -17,6 +17,8 @@ module PgPartitioner
         date_start = date.at_beginning_of_month
         date_end = date.at_beginning_of_month.next_month
         partition_table_name = name_of_partition_table(date)
+        return 'Already exists' if connection.table_exists? partition_table_name
+
         sql = "CREATE TABLE IF NOT EXISTS #{partition_table_name} (
                CHECK ( #{parting_column} >= DATE('#{date_start}') AND #{parting_column} < DATE('#{date_end}') )
                ) INHERITS (#{table_name});"
