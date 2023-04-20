@@ -43,7 +43,7 @@ module PgPartitioner
            DECLARE
              curY varchar(4);
              curM varchar(2);
-             tbl varchar(40);
+             tbl varchar(63);
            BEGIN
               select cast(DATE_PART('year', new.#{parting_column}) as varchar) into curY;
               select lpad(cast(DATE_PART('month', new.#{parting_column}) as varchar), 2, '0') into curM;
