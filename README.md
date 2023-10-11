@@ -71,9 +71,23 @@ class YouMigrationClassName
 end
 ```
 
-3) For correct work you need to create next partition every month.
+```ruby
+class YouMigrationClassName
+  def change
+    YourModel.create_partitioning_by_quater_trigger_sql
+    YourModel.create_current_quater_table
+    YourModel.create_next_quater_table
+  end
+end
+```
+
+3) For correct work you need to create next partition every month/quater.
   We recommend you to create a rake task and run it once a month by crontab. Code for a rake task:
 
 ```ruby
 YourModel.create_next_month_table
+```
+or
+```ruby
+YourModel.create_next_quater_table
 ```

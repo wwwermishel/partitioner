@@ -1,24 +1,18 @@
 module PgPartitioner
   module SeparationType
-    module Month
-      def create_current_month_table
-        create_month_table(Date.today)
+    module Quater
+      def create_current_quater_table
+        create_quater_table(Date.today)
       end
 
-      def create_next_month_table
-        create_month_table(Date.today.next_month)
+      def create_next_quater_table
+        create_quater_table(Date.today.next_quarter)
       end
 
-      def drop_old_month_table
-        table_name = name_of_partition_table(Date.today.prev_month.prev_month,
-                                             type: :quater)
-        drop_month_table(table_name)
-      end
-
-      def create_month_table(date = Date.today)
-        date_start = date.at_beginning_of_month
-        date_end = date.at_beginning_of_month.next_month
-        partition_table_name = name_of_partition_table(date, type: :month)
+      def create_quater_table(date = Date.today)
+        date_start = date.at_beginning_of_quarter
+        date_end = date.end_of_quarter.next_month.at_beginning_of_month
+        partition_table_name = name_of_partition_table(date, type: :quater)
         return 'Already exists' if connection.table_exists? partition_table_name
 
         sql = "CREATE TABLE IF NOT EXISTS #{partition_table_name} (
@@ -34,17 +28,17 @@ module PgPartitioner
         create_partition_named_unique_indexes(partition_table_name)
       end
 
-      def create_partitioning_by_month_triggers
+      def create_partitioning_by_quater_triggers
         sql = "CREATE OR REPLACE FUNCTION #{table_name}_insert_trigger() RETURNS trigger AS
     $$
            DECLARE
              curY varchar(4);
-             curM varchar(2);
-             tbl varchar(121);
+             curQ varchar(1);
+             tbl varchar(63);
            BEGIN
               select cast(DATE_PART('year', new.#{parting_column}) as varchar) into curY;
-              select lpad(cast(DATE_PART('month', new.#{parting_column}) as varchar), 2, '0') into curM;
-              tbl := '#{table_name}_y' || curY || 'm' || curM;
+              select lpad(cast(DATE_PART('quarter', new.#{parting_column}) as varchar), 2, '0') into curQ;
+              tbl := '#{table_name}_y' || curY || 'q' || curQ;
               EXECUTE format('INSERT into %I values ($1.*);', tbl) USING NEW;
               return NEW;
            END;
