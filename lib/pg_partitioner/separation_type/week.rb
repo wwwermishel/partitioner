@@ -1,18 +1,24 @@
 module PgPartitioner
   module SeparationType
-    module Quater
-      def create_current_quater_table
-        create_quater_table(Date.today)
+    module Week
+      def create_current_week_table
+        create_week_table(Date.today)
       end
 
-      def create_next_quater_table
-        create_quater_table(Date.today.next_quarter)
+      def create_next_week_table
+        create_week_table(Date.today.next_week)
       end
 
-      def create_quater_table(date = Date.today)
-        date_start = date.at_beginning_of_quarter
-        date_end = date.end_of_quarter.next_month.at_beginning_of_month
-        partition_table_name = name_of_partition_table(date, type: :quater)
+      def drop_old_week_table
+        table_name = name_of_partition_table(Date.today.prev_month.prev_month,
+                                             type: :week)
+        drop_month_table(table_name)
+      end
+
+      def create_week_table(date = Date.today)
+        date_start = date.at_beginning_of_week
+        date_end = date.at_beginning_of_week.next_week
+        partition_table_name = name_of_partition_table(date, type: :week)
         return 'Already exists' if connection.table_exists? partition_table_name
 
         sql = "CREATE TABLE IF NOT EXISTS #{partition_table_name} (
@@ -28,17 +34,17 @@ module PgPartitioner
         create_partition_named_unique_indexes(partition_table_name)
       end
 
-      def create_partitioning_by_quater_triggers
+      def create_partitioning_by_week_triggers
         sql = "CREATE OR REPLACE FUNCTION #{table_name}_insert_trigger() RETURNS trigger AS
     $$
            DECLARE
              curY varchar(4);
-             curQ varchar(1);
+             curW varchar(2);
              tbl varchar(121);
            BEGIN
               select cast(DATE_PART('year', new.#{parting_column}) as varchar) into curY;
-              select lpad(cast(DATE_PART('quarter', new.#{parting_column}) as varchar), 2, '0') into curQ;
-              tbl := '#{table_name}_y' || curY || 'q' || curQ;
+              select lpad(cast(DATE_PART('week', new.#{parting_column}) as varchar), 2, '0') into curW;
+              tbl := '#{table_name}_y' || curY || 'w' || curW;
               EXECUTE format('INSERT into %I values ($1.*);', tbl) USING NEW;
               return NEW;
            END;

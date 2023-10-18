@@ -64,6 +64,16 @@ add instructions to migration:
 ```ruby
 class YouMigrationClassName
   def change
+    YourModel.create_partitioning_by_week_trigger_sql
+    YourModel.create_current_week_table
+    YourModel.create_next_week_table
+  end
+end
+```
+
+```ruby
+class YouMigrationClassName
+  def change
     YourModel.create_partitioning_by_month_trigger_sql
     YourModel.create_current_month_table
     YourModel.create_next_month_table
@@ -84,6 +94,10 @@ end
 3) For correct work you need to create next partition every month/quater.
   We recommend you to create a rake task and run it once a month by crontab. Code for a rake task:
 
+```ruby
+YourModel.create_next_week_table
+```
+  or
 ```ruby
 YourModel.create_next_month_table
 ```

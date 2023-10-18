@@ -1,5 +1,6 @@
 require 'pg_partitioner/version'
 require 'pg_partitioner/separation_type/base'
+require 'pg_partitioner/separation_type/week'
 require 'pg_partitioner/separation_type/month'
 require 'pg_partitioner/separation_type/quater'
 
@@ -7,6 +8,7 @@ module PgPartitioner
   def self.extended(base)
     base.extend(
       PgPartitioner::SeparationType::Base,
+      PgPartitioner::SeparationType::Week,
       PgPartitioner::SeparationType::Month,
       PgPartitioner::SeparationType::Quater
     )
