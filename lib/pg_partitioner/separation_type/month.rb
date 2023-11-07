@@ -11,8 +11,8 @@ module PgPartitioner
 
       def drop_old_month_table
         table_name = name_of_partition_table(Date.today.prev_month.prev_month,
-                                             type: :quater)
-        drop_month_table(table_name)
+                                             type: :month)
+        drop_table(table_name)
       end
 
       def create_month_table(date = Date.today)
