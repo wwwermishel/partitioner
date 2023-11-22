@@ -10,7 +10,7 @@ module PgPartitioner
       end
 
       def drop_old_week_table
-        table_name = name_of_partition_table(Date.today.prev_month.prev_month,
+        table_name = name_of_partition_table(Date.today.prev_week.prev_week,
                                              type: :week)
         drop_table(table_name)
       end
