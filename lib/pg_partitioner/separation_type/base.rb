@@ -56,7 +56,11 @@ module PgPartitioner
         when :quater
           "#{table_name}_y#{date.year}q#{(((date.month - 1) / 3) + 1).to_i}"
         when :week
-          "#{table_name}_y#{date.year}w#{date.cweek}"
+          if date.cweek < 10
+            "#{table_name}_y#{date.year}w0#{date.cweek}"
+          else
+            "#{table_name}_y#{date.year}w#{date.cweek}"
+          end
         end
       end
     end
