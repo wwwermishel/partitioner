@@ -38,10 +38,10 @@ module PgPartitioner
   end
 
   def create_custom_index(table_name, index_fields, is_unique = false)
-    ActiveRecord::Migration.add_index table_name, index_fields, unique: is_unique
+    connection.add_index table_name, index_fields, unique: is_unique
   end
 
   def create_custom_named_index(table_name, index_fields, name, is_unique = false)
-    ActiveRecord::Migration.add_index table_name, index_fields, name: name, unique: is_unique
+    connection.add_index table_name, index_fields, name: name, unique: is_unique
   end
 end
