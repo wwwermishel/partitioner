@@ -28,6 +28,7 @@ module PgPartitioner
         sql = "ALTER TABLE #{partition_table_name} ADD PRIMARY KEY (id);"
         execute_sql(sql)
 
+        disable_autovacuum(partition_table_name)
         create_partition_indexes(partition_table_name)
         create_partition_named_indexes(partition_table_name)
         create_partition_unique_indexes(partition_table_name)

@@ -44,4 +44,8 @@ module PgPartitioner
   def create_custom_named_index(table_name, index_fields, name, is_unique = false)
     connection.add_index table_name, index_fields, name: name, unique: is_unique
   end
+
+  def disable_autovacuum(table_name)
+    execute_sql("ALTER TABLE #{table_name} SET (autovacuum_enabled = off);")
+  end
 end
